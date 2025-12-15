@@ -1,0 +1,920 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>C O S M I C&nbsp;&nbsp;P O R T A L</title>
+
+    <!-- icons -->
+    <link
+      rel="icon"
+      type="image/x-icon"
+      href="https://links.jessejesse.com/apple-touch-icon.png"
+    />
+    <link rel="icon" href="/favicon.ico" sizes="any" />
+    <link rel="apple-touch-icon" href="/apple-touch-icon.png" />
+    <link rel="icon" type="image/png" sizes="192x192" href="/icon-192.png" />
+    <link rel="icon" type="image/png" sizes="512x512" href="/icon-512.png" />
+
+    <!-- fonts -->
+    <link rel="preconnect" href="https://fonts.googleapis.com" />
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+    <link
+      href="https://fonts.googleapis.com/css2?family=Orbitron:wght@400;500;700;900&family=Manrope:wght@300;400;500;600&display=swap"
+      rel="stylesheet"
+    />
+    <style>
+      * {
+        margin: 0;
+        padding: 0;
+        box-sizing: border-box;
+      }
+
+      :root {
+        --primary: #00d9ff;
+        --primary-glow: rgba(0, 217, 255, 0.3);
+        --secondary: #ff006e;
+        --bg-dark: #0a0e27;
+        --bg-darker: #050811;
+        --surface: rgba(15, 23, 42, 0.85);
+        --surface-light: rgba(30, 41, 59, 0.6);
+        --text-primary: #f1f5f9;
+        --text-secondary: #94a3b8;
+        --border: rgba(148, 163, 184, 0.2);
+        --border-bright: rgba(0, 217, 255, 0.4);
+      }
+
+      body {
+        background: linear-gradient(
+          135deg,
+          var(--bg-darker) 0%,
+          var(--bg-dark) 50%,
+          #1a1034 100%
+        );
+        color: var(--text-primary);
+        overflow: hidden;
+        min-height: 100vh;
+        font-family: "Manrope", sans-serif;
+        position: relative;
+      }
+
+      body::before {
+        content: "";
+        position: fixed;
+        top: 0;
+        left: 0;
+        right: 0;
+        bottom: 0;
+        background:
+          radial-gradient(
+            circle at 20% 50%,
+            rgba(0, 217, 255, 0.08) 0%,
+            transparent 50%
+          ),
+          radial-gradient(
+            circle at 80% 20%,
+            rgba(255, 0, 110, 0.06) 0%,
+            transparent 50%
+          );
+        pointer-events: none;
+        z-index: 1;
+      }
+
+      #tsparticles {
+        position: fixed;
+        width: 100%;
+        height: 100%;
+        z-index: 2;
+      }
+
+      .container {
+        position: fixed;
+        top: 0;
+        left: 0;
+        width: 100%;
+        height: 100%;
+        display: flex;
+        z-index: 10;
+        pointer-events: none;
+      }
+
+      .controls-panel {
+        position: absolute;
+        top: 32px;
+        left: 32px;
+        width: 360px;
+        max-height: calc(100vh - 64px);
+        background: var(--surface);
+        border-radius: 20px;
+        padding: 32px;
+        border: 1px solid var(--border);
+        box-shadow:
+          0 20px 60px rgba(0, 0, 0, 0.4),
+          0 0 1px rgba(0, 217, 255, 0.3),
+          inset 0 1px 0 rgba(255, 255, 255, 0.05);
+        backdrop-filter: blur(20px);
+        z-index: 100;
+        pointer-events: auto;
+        transition: all 0.4s cubic-bezier(0.4, 0, 0.2, 1);
+        opacity: 1;
+        transform: translateX(0);
+        overflow-y: auto;
+        overflow-x: hidden;
+      }
+
+      .controls-panel::-webkit-scrollbar {
+        width: 8px;
+      }
+
+      .controls-panel::-webkit-scrollbar-track {
+        background: rgba(0, 0, 0, 0.2);
+        border-radius: 4px;
+      }
+
+      .controls-panel::-webkit-scrollbar-thumb {
+        background: var(--primary);
+        border-radius: 4px;
+      }
+
+      .controls-panel::-webkit-scrollbar-thumb:hover {
+        background: #00b8d4;
+      }
+
+      .controls-panel.hidden {
+        opacity: 0;
+        transform: translateX(-100%);
+        pointer-events: none;
+      }
+
+      .toggle-btn {
+        position: absolute;
+        top: 32px;
+        right: 32px;
+        width: 56px;
+        height: 56px;
+        background: linear-gradient(135deg, #9090c0);
+        border: solid 3px;
+        border-radius: 16px;
+        color: var(--bg-dark);
+        font-size: 24px;
+        cursor: pointer;
+        z-index: 1000;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        pointer-events: auto;
+        box-shadow:
+          0 8px 24px rgba(0, 217, 255, 0.3),
+          0 0 0 1px rgba(255, 255, 255, 0.1);
+        transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+      }
+
+      .toggle-btn:hover {
+        transform: translateY(-2px) scale(1.05);
+        box-shadow:
+          0 12px 32px rgba(0, 217, 255, 0.4),
+          0 0 0 1px rgba(255, 255, 255, 0.2);
+      }
+
+      .toggle-btn:active {
+        transform: translateY(0) scale(0.98);
+      }
+
+      h1 {
+        font-family: "Orbitron", sans-serif;
+        font-size: 2rem;
+        font-weight: 900;
+        margin-bottom: 8px;
+        background: linear-gradient(135deg, var(--primary) 0%, #00b8d4 100%);
+        -webkit-background-clip: text;
+        -webkit-text-fill-color: transparent;
+        background-clip: text;
+        letter-spacing: -0.02em;
+        line-height: 1.2;
+      }
+
+      .subtitle {
+        font-size: 0.875rem;
+        color: var(--text-secondary);
+        margin-bottom: 28px;
+        font-weight: 400;
+        letter-spacing: 0.01em;
+      }
+
+      .control-group {
+        margin-bottom: 24px;
+      }
+
+      .control-label {
+        display: flex;
+        justify-content: space-between;
+        align-items: center;
+        margin-bottom: 12px;
+        font-size: 0.875rem;
+        font-weight: 600;
+        color: var(--text-primary);
+        letter-spacing: 0.02em;
+        text-transform: uppercase;
+      }
+
+      .slider-value {
+        font-family: "Orbitron", monospace;
+        min-width: 40px;
+        text-align: center;
+        background: var(--surface-light);
+        padding: 4px 12px;
+        border-radius: 8px;
+        font-size: 0.875rem;
+        font-weight: 700;
+        color: var(--primary);
+        border: 1px solid var(--border);
+      }
+
+      input[type="range"] {
+        width: 100%;
+        height: 6px;
+        -webkit-appearance: none;
+        background: var(--surface-light);
+        border-radius: 3px;
+        outline: none;
+        border: 1px solid var(--border);
+        position: relative;
+      }
+
+      input[type="range"]::-webkit-slider-thumb {
+        -webkit-appearance: none;
+        width: 20px;
+        height: 20px;
+        border-radius: 50%;
+        background: linear-gradient(135deg, var(--primary) 0%, #00b8d4 100%);
+        cursor: pointer;
+        box-shadow:
+          0 4px 12px rgba(0, 217, 255, 0.4),
+          0 0 0 3px var(--bg-dark),
+          0 0 0 4px var(--border-bright);
+        transition: all 0.2s ease;
+      }
+
+      input[type="range"]::-webkit-slider-thumb:hover {
+        transform: scale(1.15);
+        box-shadow:
+          0 6px 16px rgba(0, 217, 255, 0.5),
+          0 0 0 3px var(--bg-dark),
+          0 0 0 5px var(--primary);
+      }
+
+      input[type="range"]::-moz-range-thumb {
+        width: 20px;
+        height: 20px;
+        border-radius: 50%;
+        background: linear-gradient(135deg, var(--primary) 0%, #00b8d4 100%);
+        cursor: pointer;
+        border: 3px solid var(--bg-dark);
+        box-shadow: 0 4px 12px rgba(0, 217, 255, 0.4);
+      }
+
+      button {
+        padding: 14px 20px;
+        border: none;
+        border-radius: 12px;
+        cursor: pointer;
+        font-weight: 600;
+        font-size: 0.875rem;
+        transition: all 0.25s cubic-bezier(0.4, 0, 0.2, 1);
+        width: 100%;
+        margin-bottom: 10px;
+        font-family: "Manrope", sans-serif;
+        letter-spacing: 0.02em;
+        text-transform: uppercase;
+        position: relative;
+        overflow: hidden;
+      }
+
+      button::before {
+        content: "";
+        position: absolute;
+        top: 0;
+        left: 0;
+        right: 0;
+        bottom: 0;
+        background: linear-gradient(
+          135deg,
+          rgba(255, 255, 255, 0.1) 0%,
+          transparent 100%
+        );
+        opacity: 0;
+        transition: opacity 0.3s ease;
+      }
+
+      button:hover::before {
+        opacity: 1;
+      }
+
+      .primary-btn {
+        background: linear-gradient(135deg, var(--primary) 0%, #00b8d4 100%);
+        color: var(--bg-dark);
+        box-shadow:
+          0 4px 16px rgba(0, 217, 255, 0.3),
+          inset 0 1px 0 rgba(255, 255, 255, 0.2);
+      }
+
+      .primary-btn:hover {
+        transform: translateY(-2px);
+        box-shadow:
+          0 8px 24px rgba(0, 217, 255, 0.4),
+          inset 0 1px 0 rgba(255, 255, 255, 0.3);
+      }
+
+      .secondary-btn {
+        background: var(--surface-light);
+        color: var(--text-primary);
+        border: 1px solid var(--border);
+        box-shadow: inset 0 1px 0 rgba(255, 255, 255, 0.05);
+      }
+
+      .secondary-btn:hover {
+        transform: translateY(-2px);
+        border-color: var(--border-bright);
+        background: rgba(30, 41, 59, 0.8);
+      }
+
+      .danger-btn {
+        background: linear-gradient(
+          135deg,
+          rgba(255, 0, 110, 0.15) 0%,
+          rgba(220, 38, 38, 0.15) 100%
+        );
+        color: #fca5a5;
+        border: 1px solid rgba(255, 0, 110, 0.3);
+      }
+
+      .danger-btn:hover {
+        transform: translateY(-2px);
+        background: linear-gradient(
+          135deg,
+          rgba(255, 0, 110, 0.25) 0%,
+          rgba(220, 38, 38, 0.25) 100%
+        );
+        border-color: rgba(255, 0, 110, 0.5);
+        color: #fecaca;
+      }
+
+      button:active {
+        transform: translateY(0) scale(0.98);
+      }
+
+      .image-preview {
+        width: 100%;
+        height: 140px;
+        border-radius: 12px;
+        overflow: hidden;
+        margin: 0 0 16px 0;
+        border: 2px solid var(--border-bright);
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        background:
+          linear-gradient(
+            135deg,
+            rgba(0, 217, 255, 0.05) 0%,
+            rgba(0, 184, 212, 0.05) 100%
+          ),
+          var(--surface-light);
+        box-shadow:
+          inset 0 2px 8px rgba(0, 0, 0, 0.2),
+          0 0 20px rgba(0, 217, 255, 0.1);
+        position: relative;
+      }
+
+      .image-preview::before {
+        content: "";
+        position: absolute;
+        top: 0;
+        left: 0;
+        right: 0;
+        bottom: 0;
+        background: repeating-linear-gradient(
+          0deg,
+          transparent,
+          transparent 2px,
+          rgba(0, 217, 255, 0.03) 2px,
+          rgba(0, 217, 255, 0.03) 4px
+        );
+        pointer-events: none;
+      }
+
+      .image-preview img {
+        max-width: 100%;
+        max-height: 100%;
+        object-fit: contain;
+        position: relative;
+        z-index: 1;
+        filter: drop-shadow(0 4px 12px rgba(0, 0, 0, 0.3));
+      }
+
+      .hidden {
+        display: none;
+      }
+
+      .status {
+        position: fixed;
+        bottom: 32px;
+        left: 50%;
+        transform: translateX(-50%) translateY(20px);
+        background: var(--surface);
+        border: 1px solid var(--border-bright);
+        padding: 16px 28px;
+        border-radius: 12px;
+        opacity: 0;
+        transition: all 0.4s cubic-bezier(0.4, 0, 0.2, 1);
+        pointer-events: none;
+        z-index: 1000;
+        font-weight: 600;
+        font-size: 0.875rem;
+        letter-spacing: 0.02em;
+        text-transform: uppercase;
+        backdrop-filter: blur(20px);
+        box-shadow:
+          0 8px 32px rgba(0, 0, 0, 0.4),
+          0 0 0 1px rgba(0, 217, 255, 0.2),
+          inset 0 1px 0 rgba(255, 255, 255, 0.1);
+      }
+
+      .status.show {
+        opacity: 1;
+        transform: translateX(-50%) translateY(0);
+      }
+
+      .button-group {
+        display: grid;
+        grid-template-columns: 1fr 1fr;
+        gap: 10px;
+        margin-bottom: 10px;
+      }
+
+      .button-group button {
+        margin-bottom: 0;
+      }
+
+      .divider {
+        height: 1px;
+        background: linear-gradient(
+          90deg,
+          transparent 0%,
+          var(--border) 50%,
+          transparent 100%
+        );
+        margin: 24px 0;
+      }
+
+      @keyframes pulse {
+        0%,
+        100% {
+          opacity: 1;
+        }
+        50% {
+          opacity: 0.5;
+        }
+      }
+
+      @keyframes slideIn {
+        from {
+          opacity: 0;
+          transform: translateX(-20px);
+        }
+        to {
+          opacity: 1;
+          transform: translateX(0);
+        }
+      }
+
+      .controls-panel > * {
+        animation: slideIn 0.6s cubic-bezier(0.4, 0, 0.2, 1) backwards;
+      }
+
+      .controls-panel > *:nth-child(1) {
+        animation-delay: 0.05s;
+      }
+      .controls-panel > *:nth-child(2) {
+        animation-delay: 0.1s;
+      }
+      .controls-panel > *:nth-child(3) {
+        animation-delay: 0.15s;
+      }
+      .controls-panel > *:nth-child(4) {
+        animation-delay: 0.2s;
+      }
+      .controls-panel > *:nth-child(5) {
+        animation-delay: 0.25s;
+      }
+      .controls-panel > *:nth-child(6) {
+        animation-delay: 0.3s;
+      }
+      .controls-panel > *:nth-child(7) {
+        animation-delay: 0.35s;
+      }
+      .controls-panel > *:nth-child(8) {
+        animation-delay: 0.4s;
+      }
+      .controls-panel > *:nth-child(9) {
+        animation-delay: 0.45s;
+      }
+      .controls-panel > *:nth-child(10) {
+        animation-delay: 0.5s;
+      }
+
+      @media (max-width: 768px) {
+        .controls-panel {
+          width: calc(100% - 64px);
+          left: 32px;
+          right: 32px;
+          max-height: calc(100vh - 120px);
+        }
+      }
+    </style>
+  </head>
+  <body>
+    <div id="tsparticles"></div>
+
+    <button class="toggle-btn" id="toggleBtn" aria-label="Toggle controls">
+      𖣐
+    </button>
+
+    <div class="container">
+      <div class="controls-panel" id="controlsPanel">
+        <h1>Cosmic Portal ──✨</h1>
+        <p class="subtitle">C O N T R O L &nbsp;&nbsp; S T A T I O N</p>
+
+        <div class="control-group">
+          <div class="image-preview">
+            <img
+              id="previewImage"
+              src="https://firebasestorage.googleapis.com/v0/b/svelte-forever.appspot.com/o/avatars%2Fjessie.png?alt=media&token=c0dbf5ee-15e0-401b-b148-feaff9b2c1a8"
+              alt="Portal image preview"
+            />
+          </div>
+
+          <div class="button-group">
+            <button id="uploadBtn" class="primary-btn">UPLOAD</button>
+            <button id="defaultBtn" class="secondary-btn">Default</button>
+          </div>
+          <button id="clearBtn" class="danger-btn">REMOVE</button>
+          <input type="file" id="imageUpload" accept="image/*" class="hidden" />
+        </div>
+
+        <div class="divider"></div>
+
+        <div class="control-group">
+          <label class="control-label">
+            <span>Size</span>
+            <span id="sizeValue" class="slider-value">40</span>
+          </label>
+          <input
+            type="range"
+            id="sizeSlider"
+            min="10"
+            max="100"
+            value="40"
+            step="1"
+          />
+        </div>
+
+        <div class="control-group">
+          <label class="control-label">
+            <span>Speed</span>
+            <span id="speedValue" class="slider-value">10</span>
+          </label>
+          <input
+            type="range"
+            id="speedSlider"
+            min="1"
+            max="30"
+            value="10"
+            step="1"
+          />
+        </div>
+
+        <div class="control-group">
+          <label class="control-label">
+            <span>Rotation</span>
+            <span id="rotationValue" class="slider-value">10</span>
+          </label>
+          <input
+            type="range"
+            id="rotationSlider"
+            min="0"
+            max="50"
+            value="10"
+            step="1"
+          />
+        </div>
+
+        <div class="control-group">
+          <label class="control-label">
+            <span>Count</span>
+            <span id="countValue" class="slider-value">1</span>
+          </label>
+          <input
+            type="range"
+            id="countSlider"
+            min="1"
+            max="5"
+            value="1"
+            step="1"
+          />
+        </div>
+
+        <div class="control-group">
+          <label class="control-label">
+            <span>Rate</span>
+            <span id="rateValue" class="slider-value">7</span>
+          </label>
+          <input
+            type="range"
+            id="rateSlider"
+            min="1"
+            max="20"
+            value="7"
+            step="1"
+          />
+        </div>
+
+        <div class="divider"></div>
+
+        <button id="randomBtn" class="primary-btn">Randomize</button>
+        <button id="resetBtn" class="secondary-btn">Reset All</button>
+      </div>
+    </div>
+
+    <div class="status" id="status">Ready</div>
+
+    <script src="https://cdn.jsdelivr.net/npm/@tsparticles/all@3.0.3/tsparticles.all.bundle.min.js"></script>
+    <script>
+      let particlesInstance = null;
+      let currentImage =
+        "https://firebasestorage.googleapis.com/v0/b/svelte-forever.appspot.com/o/avatars%2Fjessie.png?alt=media&token=c0dbf5ee-15e0-401b-b148-feaff9b2c1a8";
+
+      function initParticles() {
+        if (particlesInstance) {
+          particlesInstance.destroy();
+        }
+
+        particlesInstance = tsParticles
+          .load({
+            id: "tsparticles",
+            options: {
+              fpsLimit: 60,
+              interactivity: {
+                events: {
+                  onHover: { enable: false },
+                  resize: true,
+                },
+              },
+              particles: {
+                color: { value: "#ffffff" },
+                links: { enable: false },
+                collisions: { enable: false },
+                move: {
+                  direction: "none",
+                  enable: true,
+                  outModes: { default: "out" },
+                  random: false,
+                  speed: 1,
+                  straight: false,
+                },
+                number: { density: { enable: true, area: 800 }, value: 100 },
+                opacity: { value: 0.3 },
+                shape: { type: "circle" },
+                size: { value: { min: 1, max: 3 } },
+              },
+              emitters: {
+                direction: "right",
+                rate: {
+                  delay: parseFloat(
+                    document.getElementById("rateSlider").value,
+                  ),
+                  quantity: parseInt(
+                    document.getElementById("countSlider").value,
+                  ),
+                },
+                position: { x: 0, y: 30 },
+                size: { width: 0, height: 0 },
+                particles: {
+                  shape: {
+                    type: "image",
+                    options: {
+                      image: {
+                        src: currentImage,
+                      },
+                    },
+                  },
+                  size: {
+                    value: parseInt(
+                      document.getElementById("sizeSlider").value,
+                    ),
+                  },
+                  move: {
+                    speed: parseInt(
+                      document.getElementById("speedSlider").value,
+                    ),
+                    direction: "right",
+                    straight: true,
+                  },
+                  rotate: {
+                    value: { min: 0, max: 360 },
+                    animation: {
+                      enable: true,
+                      speed: parseInt(
+                        document.getElementById("rotationSlider").value,
+                      ),
+                    },
+                  },
+                  opacity: { value: 1 },
+                },
+              },
+              detectRetina: true,
+            },
+          })
+          .then((instance) => {
+            particlesInstance = instance;
+            showStatus("Activation Complete");
+          });
+      }
+
+      function updateParticles() {
+        if (particlesInstance) {
+          particlesInstance.options.emitters.rate = {
+            delay: parseFloat(document.getElementById("rateSlider").value),
+            quantity: parseInt(document.getElementById("countSlider").value),
+          };
+
+          particlesInstance.options.emitters.particles.size.value = parseInt(
+            document.getElementById("sizeSlider").value,
+          );
+          particlesInstance.options.emitters.particles.move.speed = parseInt(
+            document.getElementById("speedSlider").value,
+          );
+          particlesInstance.options.emitters.particles.rotate.animation.speed =
+            parseInt(document.getElementById("rotationSlider").value);
+
+          if (currentImage) {
+            particlesInstance.options.emitters.particles.shape.options.image.src =
+              currentImage;
+          }
+
+          particlesInstance.refresh();
+          showStatus("Portal Updated");
+        }
+      }
+
+      function changeImage(src) {
+        currentImage = src;
+        document.getElementById("previewImage").src = src;
+
+        if (particlesInstance) {
+          particlesInstance.options.emitters.particles.shape.options.image.src =
+            src;
+          particlesInstance.refresh();
+          showStatus("Portal is Active");
+        }
+      }
+
+      function handleImageUpload(event) {
+        const file = event.target.files[0];
+        if (!file) return;
+
+        const reader = new FileReader();
+        reader.onload = function (e) {
+          changeImage(e.target.result);
+        };
+        reader.readAsDataURL(file);
+      }
+
+      function resetToDefaults() {
+        document.getElementById("sizeSlider").value = 40;
+        document.getElementById("speedSlider").value = 10;
+        document.getElementById("rotationSlider").value = 10;
+        document.getElementById("countSlider").value = 1;
+        document.getElementById("rateSlider").value = 7;
+
+        updateSliderValues();
+        changeImage(
+          "https://firebasestorage.googleapis.com/v0/b/svelte-forever.appspot.com/o/avatars%2Fjessie.png?alt=media&token=c0dbf5ee-15e0-401b-b148-feaff9b2c1a8",
+        );
+        updateParticles();
+        showStatus("Portal Reset");
+      }
+
+      function randomizeSettings() {
+        document.getElementById("sizeSlider").value =
+          Math.floor(Math.random() * 70) + 20;
+        document.getElementById("speedSlider").value =
+          Math.floor(Math.random() * 25) + 5;
+        document.getElementById("rotationSlider").value =
+          Math.floor(Math.random() * 40) + 5;
+        document.getElementById("countSlider").value =
+          Math.floor(Math.random() * 4) + 1;
+        document.getElementById("rateSlider").value =
+          Math.floor(Math.random() * 15) + 3;
+
+        updateSliderValues();
+        updateParticles();
+        showStatus("Randomized");
+      }
+
+      function updateSliderValues() {
+        document.getElementById("sizeValue").textContent =
+          document.getElementById("sizeSlider").value;
+        document.getElementById("speedValue").textContent =
+          document.getElementById("speedSlider").value;
+        document.getElementById("rotationValue").textContent =
+          document.getElementById("rotationSlider").value;
+        document.getElementById("countValue").textContent =
+          document.getElementById("countSlider").value;
+        document.getElementById("rateValue").textContent =
+          document.getElementById("rateSlider").value;
+      }
+
+      function showStatus(message) {
+        const status = document.getElementById("status");
+        status.textContent = message;
+        status.classList.add("show");
+
+        setTimeout(() => {
+          status.classList.remove("show");
+        }, 2000);
+      }
+
+      function toggleMenu() {
+        const panel = document.getElementById("controlsPanel");
+        const btn = document.getElementById("toggleBtn");
+
+        panel.classList.toggle("hidden");
+        btn.textContent = panel.classList.contains("hidden") ? "🛸" : "✕";
+      }
+
+      document.addEventListener("DOMContentLoaded", function () {
+        initParticles();
+
+        const sliders = document.querySelectorAll('input[type="range"]');
+        sliders.forEach((slider) => {
+          slider.addEventListener("input", function () {
+            updateSliderValues();
+            updateParticles();
+          });
+        });
+
+        document
+          .getElementById("uploadBtn")
+          .addEventListener("click", function () {
+            document.getElementById("imageUpload").click();
+          });
+
+        document
+          .getElementById("imageUpload")
+          .addEventListener("change", handleImageUpload);
+
+        document
+          .getElementById("defaultBtn")
+          .addEventListener("click", function () {
+            changeImage(
+              "https://firebasestorage.googleapis.com/v0/b/svelte-forever.appspot.com/o/avatars%2Fjessie.png?alt=media&token=c0dbf5ee-15e0-401b-b148-feaff9b2c1a8",
+            );
+          });
+
+        document
+          .getElementById("clearBtn")
+          .addEventListener("click", function () {
+            const canvas = document.createElement("canvas");
+            canvas.width = 100;
+            canvas.height = 100;
+            const ctx = canvas.getContext("2d");
+
+            ctx.fillStyle = "#00d9ff";
+            ctx.beginPath();
+            ctx.arc(50, 50, 40, 0, Math.PI * 2);
+            ctx.fill();
+
+            changeImage(canvas.toDataURL());
+            showStatus("Image Cleared");
+          });
+
+        document
+          .getElementById("randomBtn")
+          .addEventListener("click", randomizeSettings);
+        document
+          .getElementById("resetBtn")
+          .addEventListener("click", resetToDefaults);
+        document
+          .getElementById("toggleBtn")
+          .addEventListener("click", toggleMenu);
+
+        updateSliderValues();
+
+        setTimeout(() => {
+          showStatus("Welcome");
+        }, 2000);
+      });
+    </script>
+  </body>
+</html>
